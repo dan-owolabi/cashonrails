@@ -1,0 +1,125 @@
+<% content_for :title, "Verify Identity — #{@merchant.business_name}" %>
+
+<div class="p-6" data-controller="verify-identity">
+
+  <%# Merchant header %>
+  <div class="flex items-center justify-between mb-5">
+    <div class="flex items-center gap-4">
+      <%= link_to admin_merchants_path, class: "text-[#919191] hover:text-[#4e4e4e] flex items-center gap-1 text-sm" do %>
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        Back
+      <% end %>
+      <div class="flex items-center gap-3">
+        <h1 class="text-base font-medium text-[#6f6e73] tracking-tight"><%= @merchant.business_name %></h1>
+        <%= render "admin/merchants/status_badge", merchant: @merchant %>
+      </div>
+    </div>
+  </div>
+
+  <%# Merchant metadata %>
+  <div class="bg-white rounded-[18px] border border-[#ebebeb] p-5 mb-4">
+    <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+      <div>
+        <p class="text-xs text-[#919191] mb-1">Business ID</p>
+        <p class="text-sm text-[#4e4e4e] font-medium"><%= @merchant.business_id_number || "—" %></p>
+      </div>
+      <div>
+        <p class="text-xs text-[#919191] mb-1">Created At</p>
+        <p class="text-sm text-[#4e4e4e]"><%= @merchant.created_at.strftime("%b %d, %Y, %-I:%M%P") %></p>
+      </div>
+      <div>
+        <p class="text-xs text-[#919191] mb-1">Confidence Score</p>
+        <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-[#ecfdfd] text-[#0ec18b] text-sm font-semibold">
+          <%= @merchant.confidence_score ? "#{@merchant.confidence_score}%" : "—" %>
+        </span>
+      </div>
+      <div>
+        <p class="text-xs text-[#919191] mb-1">Attempts</p>
+        <span class="inline-flex items-center justify-center px-3 py-0.5 rounded-full bg-[#e8e8e8] text-[#4e4e4e] text-sm font-medium">
+          <%= @merchant.attempts %>
+        </span>
+      </div>
+      <div>
+        <p class="text-xs text-[#919191] mb-1">Reviewed By</p>
+        <p class="text-sm text-[#4e4e4e]"><%= @merchant.reviewed_by || "—" %></p>
+      </div>
+    </div>
+  </div>
+
+  <%# Tab navigation %>
+  <div class="flex items-center gap-1.5 flex-wrap mb-4 bg-white rounded-[18px] border border-[#ebebeb] px-4 py-3">
+    <% tabs = [
+      { label: "Business Overview", path: admin_merchant_path(@merchant), icon: "briefcase" },
+      { label: "Documents", path: admin_merchant_path(@merchant, tab: "documents"), icon: "document" },
+      { label: "Directors", path: admin_merchant_path(@merchant, tab: "directors"), icon: "users" },
+      { label: "AML Summary", path: admin_merchant_path(@merchant, tab: "aml"), icon: "shield" },
+    ] %>
+
+    <% tabs.each do |tab| %>
+      <%= link_to tab[:path], class: "flex items-center gap-1.5 px-3 py-1.5 rounded-[9px] text-sm text-[#6f6e73] hover:bg-[#f4f4f4] transition-colors" do %>
+        <%= render "admin/merchants/tab_icon", icon: tab[:icon] %>
+        <%= tab[:label] %>
+      <% end %>
+    <% end %>
+
+    <%# Active: Verify Identity tab %>
+    <span class="flex items-center gap-1 px-3 py-1.5 rounded-[9px] text-sm font-medium text-[#4e4e4e] bg-white border border-[#ebebeb] shadow-sm cursor-default">
+      <span class="w-0.5 h-2.5 bg-[#0ca376] rounded-full mr-1"></span>
+      <svg class="w-3.5 h-3.5 text-[#6f6e73]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+      Verify Identity
+    </span>
+  </div>
+
+  <%# Verify Identity tab content %>
+  <div class="bg-[#f4f4f4] rounded-[18px] border border-[#f4f4f4] p-1.5 space-y-3">
+
+    <%# Section 1: Manual Identity Check %>
+    <div class="bg-white rounded-[16px] p-5">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-sm font-medium text-[#6f6e73]">Manual Identity Check</h2>
+        <span class="text-xs text-[#919191] bg-[#f4f4f4] px-2 py-1 rounded-full">Real-time lookup via Samson</span>
+      </div>
+
+      <div id="verify-identity-form">
+        <%= render "admin/merchants/verify_identities/form", merchant: @merchant, verification: nil, errors: [] %>
+      </div>
+    </div>
+
+    <%# Section 2: Verification Logs %>
+    <div class="bg-white rounded-[16px] p-5">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-sm font-medium text-[#6f6e73]">Verification Logs</h2>
+        <span class="text-xs text-[#919191] bg-[#f4f4f4] px-2 py-1 rounded-full">Historical records</span>
+      </div>
+
+      <%= form_with url: logs_admin_merchant_verify_identity_path(@merchant),
+                    method: :get,
+                    data: { turbo_stream: true },
+                    class: "flex items-center gap-3 mb-5" do |f| %>
+        <div class="relative flex-1 max-w-sm">
+          <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+            <svg class="w-4 h-4 text-[#919191]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+          </div>
+          <%= f.text_field :q,
+                placeholder: "Search by BVN or NIN (11 digits)",
+                class: "w-full pl-9 pr-4 py-2.5 border border-[#ebebeb] rounded-[12px] text-sm text-[#4e4e4e] placeholder-[#919191] focus:outline-none focus:border-[#0ca376] focus:ring-1 focus:ring-[#0ca376] transition-colors bg-[#fafafa]" %>
+        </div>
+        <%= f.submit "Fetch Logs",
+              class: "px-5 py-2.5 bg-[#0ca376] hover:bg-[#0a8f67] text-white text-sm font-medium rounded-[12px] transition-colors cursor-pointer" %>
+      <% end %>
+
+      <div id="verification-logs">
+        <%= render "admin/merchants/verify_identities/logs", verifications: IdentityVerification.none, id_number: nil %>
+      </div>
+    </div>
+
+  </div>
+
+  <%# One-time result modal (hidden until verify is triggered) %>
+  <div id="identity-result-modal">
+    <%= render "admin/merchants/verify_identities/result_modal", verification: nil %>
+  </div>
+
+</div>

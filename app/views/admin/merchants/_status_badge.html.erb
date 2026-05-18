@@ -1,0 +1,10 @@
+<% color_classes = {
+  "approved" => "bg-[#ecfdfd] text-[#0ec18b] border-[#d9f3f3]",
+  "rejected" => "bg-red-50 text-red-600 border-red-100",
+  "suspended" => "bg-amber-50 text-amber-600 border-amber-100",
+  "pending" => "bg-[#e8e8e8] text-[#4e4e4e] border-[#e8e8e8]"
+} %>
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border text-xs <%= color_classes[merchant.status] || color_classes['pending'] %>">
+  <span class="w-1.5 h-1.5 rounded-full <%= merchant.status == 'approved' ? 'bg-[#0ec18b]' : merchant.status == 'rejected' ? 'bg-red-500' : 'bg-[#919191]' %>"></span>
+  <%= merchant.status.capitalize %>
+</span>

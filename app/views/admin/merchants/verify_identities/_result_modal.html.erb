@@ -1,0 +1,101 @@
+<% if verification&.verified? %>
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4"
+       data-controller="modal"
+       data-action="keydown.escape@window->modal#close click->modal#backdropClose">
+
+    <%# Backdrop %>
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" data-modal-target="backdrop"></div>
+
+    <%# Modal panel %>
+    <div class="relative bg-white rounded-[20px] shadow-2xl w-full max-w-md overflow-hidden"
+         data-modal-target="panel">
+
+      <%# Header %>
+      <div class="flex items-center justify-between px-6 py-4 border-b border-[#f4f4f4]">
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 bg-[#ecfdfd] rounded-full flex items-center justify-center">
+            <svg class="w-3.5 h-3.5 text-[#0ec18b]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+            </svg>
+          </div>
+          <h3 class="text-sm font-semibold text-[#4e4e4e]">Identity Verified</h3>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-xs bg-[#f4f4f4] text-[#919191] px-2 py-0.5 rounded-full">One-time view</span>
+          <button type="button"
+                  class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-[#f4f4f4] text-[#919191] hover:text-[#4e4e4e] transition-colors"
+                  data-action="click->modal#close">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <%# Body %>
+      <div class="px-6 py-5 space-y-5">
+
+        <%# Portrait + name header %>
+        <div class="flex items-center gap-4">
+          <div class="w-16 h-16 rounded-[14px] bg-[#f4f4f4] overflow-hidden shrink-0 border border-[#ebebeb]">
+            <% if verification.image_url.present? %>
+              <img src="<%= verification.image_url %>" alt="Portrait" class="w-full h-full object-cover">
+            <% else %>
+              <div class="w-full h-full flex items-center justify-center">
+                <svg class="w-7 h-7 text-[#919191]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                </svg>
+              </div>
+            <% end %>
+          </div>
+          <div>
+            <p class="text-base font-semibold text-[#4e4e4e]"><%= verification.full_name || "—" %></p>
+            <div class="flex items-center gap-2 mt-1">
+              <span class="text-xs bg-[#ecfdfd] text-[#0ec18b] border border-[#d9f3f3] px-2 py-0.5 rounded-full font-medium">
+                <%= verification.id_type_label %> Verified
+              </span>
+              <span class="text-xs text-[#919191] font-mono"><%= verification.id_number %></span>
+            </div>
+          </div>
+        </div>
+
+        <%# Details grid %>
+        <div class="bg-[#fafafa] rounded-[14px] border border-[#f4f4f4] divide-y divide-[#f4f4f4]">
+          <% fields = [
+            ["Date of Birth", verification.date_of_birth&.strftime("%B %d, %Y")],
+            ["Phone Number", verification.phone_number],
+            ["Gender", verification.gender&.capitalize],
+            ["Verification Type", verification.id_type_label],
+            ["Verified At", verification.created_at.strftime("%b %d, %Y at %-I:%M%P")],
+            ["Verified By", verification.admin_user.email],
+          ] %>
+          <% fields.each do |label, value| %>
+            <div class="flex items-center justify-between px-4 py-3">
+              <span class="text-xs text-[#919191]"><%= label %></span>
+              <span class="text-sm text-[#4e4e4e] font-medium"><%= value || "—" %></span>
+            </div>
+          <% end %>
+        </div>
+
+        <%# Security notice %>
+        <div class="flex items-start gap-2.5 bg-amber-50 border border-amber-100 rounded-[12px] px-4 py-3">
+          <svg class="w-4 h-4 text-amber-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+          <p class="text-xs text-amber-700 leading-relaxed">
+            This data is shown once for privacy protection. Closing this modal will permanently clear it from the UI. Use Verification Logs to retrieve saved records.
+          </p>
+        </div>
+      </div>
+
+      <%# Footer %>
+      <div class="px-6 py-4 border-t border-[#f4f4f4] flex justify-end">
+        <button type="button"
+                class="px-5 py-2 bg-[#0ca376] hover:bg-[#0a8f67] text-white text-sm font-medium rounded-[12px] transition-colors"
+                data-action="click->modal#close">
+          Close & Clear
+        </button>
+      </div>
+    </div>
+  </div>
+<% end %>

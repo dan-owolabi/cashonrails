@@ -1,0 +1,70 @@
+<% if id_number.blank? %>
+  <div class="flex flex-col items-center justify-center py-10 text-center">
+    <div class="w-10 h-10 bg-[#f4f4f4] rounded-full flex items-center justify-center mb-3">
+      <svg class="w-5 h-5 text-[#919191]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+      </svg>
+    </div>
+    <p class="text-sm text-[#919191]">Enter a BVN or NIN above to search verification history</p>
+  </div>
+<% elsif verifications.empty? %>
+  <div class="flex flex-col items-center justify-center py-10 text-center">
+    <div class="w-10 h-10 bg-[#f4f4f4] rounded-full flex items-center justify-center mb-3">
+      <svg class="w-5 h-5 text-[#919191]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+    </div>
+    <p class="text-sm font-medium text-[#4e4e4e]">No records found</p>
+    <p class="text-xs text-[#919191] mt-1">No verification logs for <span class="font-mono"><%= id_number %></span></p>
+  </div>
+<% else %>
+  <div class="space-y-3">
+    <p class="text-xs text-[#919191] mb-2">
+      <%= pluralize(verifications.count, "record") %> found for <span class="font-mono text-[#4e4e4e]"><%= id_number %></span>
+    </p>
+    <% verifications.each do |v| %>
+      <div class="border border-[#f4f4f4] rounded-[14px] overflow-hidden">
+        <div class="flex items-center justify-between px-4 py-3 bg-[#fafafa] border-b border-[#f4f4f4]">
+          <div class="flex items-center gap-3">
+            <%# Portrait thumbnail %>
+            <div class="w-10 h-10 rounded-[10px] bg-[#f4f4f4] overflow-hidden shrink-0 border border-[#ebebeb]">
+              <% if v.image_url.present? %>
+                <img src="<%= v.image_url %>" alt="Portrait" class="w-full h-full object-cover">
+              <% else %>
+                <div class="w-full h-full flex items-center justify-center">
+                  <svg class="w-5 h-5 text-[#919191]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                  </svg>
+                </div>
+              <% end %>
+            </div>
+            <div>
+              <p class="text-sm font-medium text-[#4e4e4e]"><%= v.full_name || "Unknown" %></p>
+              <p class="text-xs text-[#919191] font-mono"><%= v.id_type_label %>: <%= v.id_number %></p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <% status_class = v.verified? ? "bg-[#ecfdfd] text-[#0ec18b] border-[#d9f3f3]" : "bg-red-50 text-red-600 border-red-100" %>
+            <span class="text-xs border px-2 py-0.5 rounded-full font-medium <%= status_class %>">
+              <%= v.status.capitalize %>
+            </span>
+          </div>
+        </div>
+        <div class="grid grid-cols-3 gap-px bg-[#f4f4f4]">
+          <div class="bg-white px-4 py-3">
+            <p class="text-xs text-[#919191] mb-0.5">Date of Birth</p>
+            <p class="text-sm text-[#4e4e4e]"><%= v.date_of_birth&.strftime("%b %d, %Y") || "—" %></p>
+          </div>
+          <div class="bg-white px-4 py-3">
+            <p class="text-xs text-[#919191] mb-0.5">Verified At</p>
+            <p class="text-sm text-[#4e4e4e]"><%= v.created_at.strftime("%b %d, %Y") %></p>
+          </div>
+          <div class="bg-white px-4 py-3">
+            <p class="text-xs text-[#919191] mb-0.5">Checked By</p>
+            <p class="text-sm text-[#4e4e4e] truncate"><%= v.admin_user.email %></p>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% end %>

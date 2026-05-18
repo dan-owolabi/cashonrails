@@ -1,0 +1,40 @@
+<div class="p-6">
+  <div class="mb-6">
+    <h1 class="text-xl font-semibold text-[#4e4e4e] tracking-tight">Merchants</h1>
+    <p class="text-sm text-[#919191] mt-1">Manage and review merchant accounts</p>
+  </div>
+
+  <div class="bg-white rounded-[18px] border border-[#ebebeb] overflow-hidden">
+    <table class="w-full">
+      <thead>
+        <tr class="border-b border-[#f4f4f4]">
+          <th class="text-left px-5 py-4 text-xs font-medium text-[#919191] tracking-wide uppercase">Business</th>
+          <th class="text-left px-5 py-4 text-xs font-medium text-[#919191] tracking-wide uppercase">Status</th>
+          <th class="text-left px-5 py-4 text-xs font-medium text-[#919191] tracking-wide uppercase">Business ID</th>
+          <th class="text-left px-5 py-4 text-xs font-medium text-[#919191] tracking-wide uppercase">Created</th>
+          <th class="px-5 py-4"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-[#f4f4f4]">
+        <% @merchants.each do |merchant| %>
+          <tr class="hover:bg-[#fafafa] transition-colors">
+            <td class="px-5 py-4 text-sm text-[#4e4e4e] font-medium"><%= merchant.business_name %></td>
+            <td class="px-5 py-4">
+              <%= render "admin/merchants/status_badge", merchant: merchant %>
+            </td>
+            <td class="px-5 py-4 text-sm text-[#6f6e73]"><%= merchant.business_id_number || "—" %></td>
+            <td class="px-5 py-4 text-sm text-[#6f6e73]"><%= merchant.created_at.strftime("%b %d, %Y") %></td>
+            <td class="px-5 py-4 text-right">
+              <%= link_to "View", admin_merchant_path(merchant), class: "text-sm text-[#0ca376] hover:text-[#0a8f67] font-medium" %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @merchants.empty? %>
+          <tr>
+            <td colspan="5" class="px-5 py-12 text-center text-sm text-[#919191]">No merchants found</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

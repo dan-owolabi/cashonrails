@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title><%= content_for(:title) || "Cashonrails Admin" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+  <body class="bg-[#f4f4f4] min-h-screen font-sans">
+    <div class="flex h-screen overflow-hidden">
+      <%= render "layouts/admin_sidebar" %>
+      <div class="flex-1 overflow-y-auto">
+        <% if notice %>
+          <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 m-4 rounded-lg text-sm">
+            <%= notice %>
+          </div>
+        <% end %>
+        <% if alert %>
+          <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 m-4 rounded-lg text-sm">
+            <%= alert %>
+          </div>
+        <% end %>
+        <%= yield %>
+      </div>
+    </div>
+  </body>
+</html>

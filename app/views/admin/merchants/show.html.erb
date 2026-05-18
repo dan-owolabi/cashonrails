@@ -1,0 +1,74 @@
+<div class="p-6">
+  <%# Merchant header %>
+  <div class="flex items-center justify-between mb-5">
+    <div class="flex items-center gap-4">
+      <%= link_to admin_merchants_path, class: "text-[#919191] hover:text-[#4e4e4e] flex items-center gap-1 text-sm" do %>
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        Back
+      <% end %>
+      <div class="flex items-center gap-3">
+        <h1 class="text-base font-medium text-[#6f6e73] tracking-tight"><%= @merchant.business_name %></h1>
+        <%= render "admin/merchants/status_badge", merchant: @merchant %>
+      </div>
+    </div>
+  </div>
+
+  <%# Merchant metadata %>
+  <div class="bg-white rounded-[18px] border border-[#ebebeb] p-5 mb-4">
+    <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+      <div>
+        <p class="text-xs text-[#919191] mb-1">Business ID</p>
+        <p class="text-sm text-[#4e4e4e] font-medium"><%= @merchant.business_id_number || "—" %></p>
+      </div>
+      <div>
+        <p class="text-xs text-[#919191] mb-1">Created At</p>
+        <p class="text-sm text-[#4e4e4e]"><%= @merchant.created_at.strftime("%b %d, %Y, %-I:%M%P") %></p>
+      </div>
+      <div>
+        <p class="text-xs text-[#919191] mb-1">Confidence Score</p>
+        <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-[#ecfdfd] text-[#0ec18b] text-sm font-semibold">
+          <%= @merchant.confidence_score ? "#{@merchant.confidence_score}%" : "—" %>
+        </span>
+      </div>
+      <div>
+        <p class="text-xs text-[#919191] mb-1">Attempts</p>
+        <span class="inline-flex items-center justify-center px-3 py-0.5 rounded-full bg-[#e8e8e8] text-[#4e4e4e] text-sm font-medium">
+          <%= @merchant.attempts %>
+        </span>
+      </div>
+      <div>
+        <p class="text-xs text-[#919191] mb-1">Reviewed By</p>
+        <p class="text-sm text-[#4e4e4e]"><%= @merchant.reviewed_by || "—" %></p>
+      </div>
+    </div>
+  </div>
+
+  <%# Tab navigation %>
+  <div class="flex items-center gap-1.5 flex-wrap mb-4 bg-white rounded-[18px] border border-[#ebebeb] px-4 py-3">
+    <% tabs = [
+      { label: "Business Overview", path: admin_merchant_path(@merchant), icon: "briefcase" },
+      { label: "Documents", path: admin_merchant_path(@merchant, tab: "documents"), icon: "document" },
+      { label: "Directors", path: admin_merchant_path(@merchant, tab: "directors"), icon: "users" },
+      { label: "AML Summary", path: admin_merchant_path(@merchant, tab: "aml"), icon: "shield" },
+    ] %>
+
+    <% tabs.each do |tab| %>
+      <%= link_to tab[:path], class: "flex items-center gap-1.5 px-3 py-1.5 rounded-[9px] text-sm text-[#6f6e73] hover:bg-[#f4f4f4] transition-colors" do %>
+        <%= render "admin/merchants/tab_icon", icon: tab[:icon] %>
+        <%= tab[:label] %>
+      <% end %>
+    <% end %>
+
+    <%# Active: Verify Identity tab %>
+    <%= link_to admin_merchant_verify_identity_path(@merchant), class: "flex items-center gap-1 px-3 py-1.5 rounded-[9px] text-sm font-medium text-[#4e4e4e] bg-white border border-[#ebebeb] shadow-sm" do %>
+      <span class="w-0.5 h-2.5 bg-[#0ca376] rounded-full mr-1"></span>
+      <svg class="w-3.5 h-3.5 text-[#6f6e73]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+      Verify Identity
+    <% end %>
+  </div>
+
+  <%# Tab content placeholder (show/tab will override this) %>
+  <div class="bg-white rounded-[18px] border border-[#ebebeb] p-6">
+    <p class="text-sm text-[#919191]">Select a tab to view content.</p>
+  </div>
+</div>
